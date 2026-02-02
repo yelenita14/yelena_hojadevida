@@ -1,0 +1,61 @@
+{% extends 'curriculum/base_admin.html' %}
+{% block title %}{% if form.instance.pk %}Editar{% else %}Agregar{% endif %} Producto Académico{% endblock %}
+
+{% block content %}
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>
+            {% if form.instance.pk %}
+                <i class="fas fa-edit me-2"></i> Editar Producto Académico
+            {% else %}
+                <i class="fas fa-plus-circle me-2"></i> Agregar Producto Académico
+            {% endif %}
+        </h2>
+        <a href="{% url 'curriculum:dashboard' %}" class="btn-volver">Volver</a>
+    </div>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-grid">
+            
+            <div class="form-group" style="grid-column: span 2;">
+                <label class="form-label">Nombre del Producto:</label>
+                <input type="text" name="nombrerecurso" value="{{ form.nombrerecurso.value|default:'' }}" placeholder="Ej: Publicación en Revista Científica">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Clasificador/Categoría:</label>
+                {{ form.clasificador }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Enlace / Link (Opcional):</label>
+                <input type="url" name="link" value="{{ form.link.value|default:'' }}" placeholder="https://...">
+            </div>
+
+            <div class="form-group" style="grid-column: span 2;">
+                <label class="form-label">Descripción:</label>
+                <textarea name="descripcion" rows="4">{{ form.descripcion.value|default:'' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Mostrar en el front: 
+                    <input type="checkbox" name="activarparaqueseveaenfront" {% if form.activarparaqueseveaenfront.value %}checked{% endif %}>
+                </label>
+            </div>
+            
+            <div class="form-actions" style="grid-column: span 2; display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; border-radius: 10px; font-weight: bold; background-color: #66f7a7; color: white; border: none; font-size: 16px; cursor: pointer;">
+                    Guardar
+                </button>
+                
+                <a href="{% url 'curriculum:dashboard' %}" style="width: 100%; padding: 14px; border-radius: 10px; font-weight: bold; background-color: #94948c; color: white; text-decoration: none; text-align: center; font-size: 16px; box-sizing: border-box;">
+                    Cancelar
+                </a>
+
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

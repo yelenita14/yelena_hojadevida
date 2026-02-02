@@ -1,0 +1,619 @@
+{% extends 'curriculum/base.html' %}
+
+{% block content %}
+
+<style>
+    :root {
+        --color-sec1: #ff9a9e; /* Rosa suave para Datos Personales */
+        --text-dark: #2d3436;
+        --text-muted: #636e72;
+        --bg-glass: rgba(255, 255, 255, 0.9);
+    }
+
+    /* ===== CONTENEDOR PRINCIPAL ===== */
+    .cv-content {
+        padding: 20px;
+        max-width: 1000px;
+        margin: auto;
+    }
+
+    /* ===== BARRA DE ACCIONES ===== */
+    .action-header {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    /* ===== BARRA COMPLETA (CV_ADMIN + BOTONES) ===== */
+    .action-header-full {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    /* ===== BOTONES ===== */
+    .btn-cv {
+        padding: 10px 18px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-manage { background-color: #f1f5f9; color: #475569; }
+    .btn-pdf-section { background-color: #e0f2f1; color: #00897b; }
+    .btn-pdf-all { background-color: #1e293b; color: white; }
+
+    /* ===== BOTÓN CV_ADMIN ===== */
+    .btn-admin {
+        background-color: #ede9fe;  /* tono pastel coherente con tu diseño */
+        color: #4c1d95;
+    }
+
+    .btn-admin:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    /* ===== DISEÑO DE TARJETA (GLASS PANEL) ===== */
+    .glass-panel {
+        background: var(--bg-glass);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .section-header {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f1f2f6;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* ===== PERFIL Y FOTO ===== */
+    .profile-photo-frame {
+        width: 150px;
+        height: 150px;
+        border-radius: 20px;
+        overflow: hidden;
+        flex-shrink: 0;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+
+    .profile-photo-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .perfil-badge {
+        background: #ffeaa7;
+        color: #d63031;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    /* ===== GRID DE DATOS ===== */
+    .data-grid-compact {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-item label {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+        font-weight: 700;
+    }
+
+    .info-item span {
+        font-size: 1rem;
+        color: var(--text-dark);
+        font-weight: 500;
+    }
+
+    /* ===== TARJETAS DE CONTENIDO (Experiencia, Cursos) ===== */
+    .data-card {
+        background: white;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #edf2f7;
+        transition: transform 0.2s;
+    }
+
+    .data-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .header-flex { flex-direction: column; text-align: center; }
+        .profile-photo-frame { margin: 0 auto; }
+
+        /* Barra de acciones se acomoda en vertical */
+        .action-header-full {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .action-header {
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    }
+
+    /* ===== IMPRESIÓN PDF ===== */
+    .modal {
+        display: none; 
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-box {
+        background-color: white;
+        padding: 30px;
+        border-radius: 30px; 
+        width: 85%;
+        max-width: 360px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        text-align: center;
+    }
+
+    .modal-header {
+        color: #003366;
+        font-size: 19px;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    .modal-options {
+        text-align: left;
+        margin-bottom: 25px;
+        padding-left: 15px;
+    }
+
+    .modal-options label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    /* Checkboxes más grandes */
+    .modal-options input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+        accent-color: #2563eb;
+    }
+
+    /* Botones de colores exactos */
+    .modal-actions {
+        display: flex;
+        gap: 15px;
+    }
+
+    .modal-actions button {
+        flex: 1;
+        padding: 15px;
+        border-radius: 20px;
+        border: none;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        color: white;
+    }
+
+    .btn-red { background-color: #e61e4d; }
+    .btn-blue { background-color: #2563eb; }
+
+    .btn-whatsapp {
+    display: inline-block;
+    background-color: #25D366; /* Verde oficial de WhatsApp */
+    color: white !important;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 15px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .btn-whatsapp:hover {
+        background-color: #128C7E;
+    }
+</style>
+
+<div class="action-header-full">
+    <a href="{% url 'curriculum:login' %}" class="btn-cv btn-admin">
+        CV_ADMIN
+    </a>
+
+    <div class="action-header">
+        {% if user.is_authenticated %}
+            <a href="{% url 'curriculum:dashboard' %}" class="btn-cv btn-manage">
+                <i class="fas fa-th-large"></i> Panel de Gestión
+            </a>
+        {% endif %}
+
+        <button type="button" onclick="abrirModal()" class="btn-cv btn-pdf-all">
+            <i class="fas fa-print"></i> Descargar PDF
+        </button>
+    </div>
+</div>
+
+
+{% if perfil %}
+    <div id="sec1" class="section-box active">
+        <div class="glass-panel">
+            <h2 class="section-header"><i class="fas fa-user-circle"></i> Datos Personales</h2>
+            <div style="display: flex; gap: 25px; align-items: center; margin-bottom: 25px;">
+                <div class="profile-photo-frame" style="border: 4px solid var(--color-sec1);">
+                    {% if perfil.foto_perfil %}
+                        <img src="{{ perfil.foto_perfil.url }}" alt="Perfil">
+                    {% else %}
+                        <i class="fas fa-user fa-3x" style="color:#cbd5e1;"></i>
+                    {% endif %}
+                </div>
+                <div>
+                    <h1 style="font-family:'Playfair Display', serif; font-size: 2.2rem; margin:0;">{{ perfil.nombres }} {{ perfil.apellidos }}</h1>
+                    <p style="color:var(--text-muted);"><i class="fas fa-map-marker-alt"></i> {{ perfil.direcciondomiciliaria }}</p>
+                </div>
+            </div>
+            <div class="data-grid-compact">
+                <div class="info-item"><label>Cédula</label><span>{{ perfil.numerocedula }}</span></div>
+                <div class="info-item"><label>Nacionalidad</label><span>{{ perfil.nacionalidad }}</span></div>
+                <div class="info-item"><label>Nacimiento</label><span>{{ perfil.fechanacimiento|date:"d/m/Y" }}</span></div>
+                <div class="info-item"><label>Lugar Nacimiento</label><span>{{ perfil.lugarnacimiento }}</span></div>
+                <div class="info-item"><label>Celular</label><span>{{ perfil.telefonofijo }}</span></div>
+                <div class="info-item"><label>Estado Civil</label><span>{{ perfil.estadocivil }}</span></div>
+                <div class="info-item"><label>Sexo</label><span>{{ perfil.get_sexo_display|default:perfil.sexo }}</span></div>
+                 {% if perfil.sitioweb %}<div class="info-item"><strong>Sitio Web:</strong><span><a href="{{ perfil.sitioweb }}" target="_blank" style="color: var(--morado-premium);">{{ perfil.sitioweb }}</a></span></div>{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div id="sec2" class="section-box">
+    <div class="glass-panel">
+        <h2 class="section-header"><i class="fas fa-tools"></i> Experiencia Laboral</h2>
+        
+        {% for exp in experiencias %}
+        <div class="data-card">
+            <h3 style="color: var(--neon-blue);">{{ exp.cargodesempenado }}</h3>
+            <p style="color: #94a3b8; margin: 5px 0;">
+                <strong>{{ exp.nombrempresa }}</strong> 
+                {% if exp.lugarempresa %}| {{ exp.lugarempresa }}{% endif %}
+            </p>
+
+            <p style="font-size: 0.85rem; color: #64748b;">
+                {{ exp.fechainiciogestion }} - {% if exp.fechafingestion %}{{ exp.fechafingestion }}{% else %}Actualidad{% endif %}
+            </p>
+
+            {% if exp.descripcionfunciones %}
+            <div style="margin: 10px 0; color: #cbd5e1; font-size: 0.9rem;">
+                {{ exp.descripcionfunciones|linebreaks }}
+            </div>
+            {% endif %}
+
+            <div style="font-size: 0.8rem; color: #94a3b8; border-top: 1px solid #334155; padding-top: 10px; margin-top: 10px;">
+                {% if exp.nombrecontactoempresarial %}
+                    <p style="margin-bottom: 2px;"><strong>Contacto:</strong> {{ exp.nombrecontactoempresarial }}</p>
+                {% endif %}
+                
+                {% if exp.telefonocontactoempresarial %}
+                    <p style="margin-bottom: 2px;"><i class="fas fa-phone-alt"></i> {{ exp.telefonocontactoempresarial }}</p>
+                {% endif %}
+
+                {% if exp.emailempresa %}
+                    <p style="margin-bottom: 2px;"><i class="fas fa-envelope"></i> {{ exp.emailempresa }}</p>
+                {% endif %}
+
+                {% if exp.sitiowebempresa %}
+                    <p style="margin-bottom: 2px;">
+                        <i class="fas fa-globe"></i> 
+                        <a href="{{ exp.sitioweb }}" target="_blank" style="color: var(--neon-blue); text-decoration: none;">{{ exp.sitiowebempresa }}</a>
+                    </p>
+                {% endif %}
+            </div>
+
+            {% if exp.rutacertificado %}
+                <div style="margin-top: 10px;">
+                    <a href="{{ exp.rutacertificado.url }}" class="link-btn" target="_blank">Ver Certificado</a>
+                </div>
+            {% endif %}
+        </div>
+        {% empty %}
+            <p class="text-center text-muted">No hay experiencias registradas.</p>
+        {% endfor %}
+    </div>
+</div>
+
+    <div id="sec3" class="section-box">
+    <div class="glass-panel">
+        <h2 class="section-header"><i class="fas fa-graduation-cap"></i> Cursos Realizados</h2>
+        
+        {% for c in cursos %}
+        <div class="data-card">
+            <h3 style="color: var(--neon-blue);">{{ c.nombrecurso }}</h3>
+            
+            <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 5px;">
+                <strong>{{ c.totalhoras }} horas</strong> | 
+                {{ c.fechainicio|date:"d/m/Y" }} - {{ c.fechafin|date:"d/m/Y" }}
+            </p>
+            
+            <p style="color: #cbd5e1; margin-bottom: 5px;">
+                <i class="fas fa-university me-1"></i> {{ c.entidadpatrocinadora }}
+            </p>
+
+            {% if c.descripcioncurso %}
+            <div style="color: #64748b; font-size: 0.85rem; margin: 10px 0; border-left: 2px solid #334155; padding-left: 10px;">
+                {{ c.descripcioncurso|linebreaks }}
+            </div>
+            {% endif %}
+
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px; padding-top: 10px; border-top: 1px rgba(255,255,255,0.1) solid;">
+                {% if c.nombrecontactoauspicia %}
+                    <p style="margin-bottom: 2px;"><strong>Contacto:</strong> {{ c.nombrecontactoauspicia }}</p>
+                {% endif %}
+                
+                {% if c.telefonocontactoauspicia %}
+                    <p style="margin-bottom: 2px;"><i class="fas fa-phone-alt"></i> {{ c.telefonocontactoauspicia }}</p>
+                {% endif %}
+
+                {% if c.emailempresapatrocinadora %}
+                    <p style="margin-bottom: 2px;"><i class="fas fa-envelope"></i> {{ c.emailempresapatrocinadora }}</p>
+                {% endif %}
+            </div>
+
+            {% if c.rutacertificado %}
+                <div style="margin-top: 10px;">
+                    <a href="{{ c.rutacertificado.url }}" class="link-btn" target="_blank">Ver Certificado</a>
+                </div>
+            {% endif %}
+        </div>
+        {% empty %}
+            <p class="text-center text-muted">No hay cursos registrados aún.</p>
+        {% endfor %}
+    </div>
+</div>
+
+    <div id="sec4" class="section-box">
+    <div class="glass-panel">
+        <h2 class="section-header"><i class="fas fa-award"></i> Reconocimientos</h2>
+        
+        {% for r in reconocimientos %}
+        <div class="data-card">
+            <h3 style="color: var(--neon-blue);">{{ r.tiporeconocimiento }}</h3>
+            
+            <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 5px;">
+                <strong>{{ r.fechareconocimiento|date:"d/m/Y" }}</strong> | {{ r.entidadpatrocinadora }}
+            </p>
+
+            {% if r.descripcionreconocimiento %}
+            <div style="color: #cbd5e1; margin: 10px 0; font-size: 0.95rem;">
+                {{ r.descripcionreconocimiento|linebreaks }}
+            </div>
+            {% endif %}
+
+            <div style="font-size: 0.8rem; color: #64748b; margin-top: 10px; padding-top: 10px; border-top: 1px rgba(255,255,255,0.1) solid;">
+                {% if r.nombrecontactoauspicia %}
+                    <p style="margin-bottom: 2px;"><strong>Referencia:</strong> {{ r.nombrecontactoauspicia }}</p>
+                {% endif %}
+                
+                {% if r.telefonocontactoauspicia %}
+                    <p style="margin-bottom: 2px;"><i class="fas fa-phone-alt"></i> {{ r.telefonocontactoauspicia }}</p>
+                {% endif %}
+            </div>
+
+            {% if r.rutacertificado %}
+                <div style="margin-top: 10px;">
+                    <a href="{{ r.rutacertificado.url }}" class="link-btn" target="_blank">
+                        <i class="fas fa-certificate me-1"></i> Ver Reconocimiento
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        {% empty %}
+            <p class="text-center text-muted">No hay reconocimientos registrados aún.</p>
+        {% endfor %}
+    </div>
+</div>
+
+    <div id="sec5" class="section-box">
+    <div class="glass-panel">
+        <h2 class="section-header"><i class="fas fa-microscope"></i> Productos Académicos</h2>
+        
+        {% for a in productos_academicos %}
+        <div class="data-card">
+            <span class="status-badge" style="background: rgba(0, 210, 255, 0.1); color: var(--neon-blue); margin-bottom: 10px; display: inline-block; padding: 2px 8px; border-radius: 4px;">
+                {{ a.clasificador }}
+            </span>
+
+            <h3>{{ a.nombrerecurso }}</h3>
+
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 10px;">
+                <i class="far fa-calendar-alt me-1"></i> 
+                <strong>Fecha de registro:</strong> {{ a.fecha_registro|date:"d/m/Y" }}
+            </p>
+
+            {% if a.descripcion %}
+            <p style="color: #94a3b8; font-size: 0.9rem; margin: 10px 0;">
+                {{ a.descripcion }}
+            </p>
+            {% endif %}
+
+            {% if a.link %}
+                <a href="{{ a.link }}" class="link-btn" target="_blank">Ver en Línea</a>
+            {% endif %}
+        </div>
+        {% empty %}
+            <p class="text-center text-muted">No hay productos académicos registrados.</p>
+        {% endfor %}
+    </div>
+</div>
+
+    <div id="sec6" class="section-box">
+    <div class="glass-panel">
+        <h2 class="section-header"><i class="fas fa-laptop-code"></i> Productos Laborales</h2>
+        
+        {% for l in productos_laborales %}
+        <div class="data-card">
+            <h3 style="color: var(--neon-blue);">{{ l.nombreproducto }}</h3>
+            
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px;">
+                <i class="far fa-calendar-alt me-1"></i> {{ l.fechaproducto|date:"d/m/Y" }}
+            </p>
+            
+            <p style="color: #94a3b8; font-size: 0.95rem;">{{ l.descripcion }}</p>
+            
+            {% if l.link %}
+                <div style="margin-top: 15px;">
+                    <a href="{{ l.link }}" class="link-btn" target="_blank">
+                        Ver Proyecto <i class="fas fa-external-link-alt ms-1"></i>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        {% empty %}
+            <p class="text-center text-muted">No hay productos laborales registrados.</p>
+        {% endfor %}
+    </div>
+</div>
+
+    <div id="sec7" class="section-box">
+    <div class="glass-panel">
+        <h2 class="section-header"><i class="fas fa-shopping-bag"></i> Venta Garage</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+            {% for v in ventas %}
+            <div class="data-card" style="padding:0; overflow:hidden; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02);">
+                
+                {% if v.imagen_producto %}
+                    <img src="{{ v.imagen_producto.url }}" alt="{{ v.nombreproducto }}" style="width:100%; height:160px; object-fit:cover;">
+                {% else %}
+                    <div style="width:100%; height:160px; background:#2d3436; display:flex; align-items:center; justify-content:center;">
+                        <i class="fas fa-image fa-2x" style="color:#636e72;"></i>
+                    </div>
+                {% endif %}
+
+                <div style="padding:15px;">
+                    <h3 style="font-size:1.1rem; margin:0 0 5px 0; color: #f8fafc;">{{ v.nombreproducto }}</h3>
+                    
+                    <p style="font-weight:800; color: var(--neon-blue); font-size: 1.2rem; margin: 5px 0;">
+                        ${{ v.valordelbien }}
+                    </p>
+                    
+                    <span class="status-badge" style="background: rgba(0, 210, 255, 0.1); color: var(--neon-blue); font-size: 0.7rem; padding: 2px 8px; border-radius: 4px;">
+                        Estado: {{ v.estadoproducto }}
+                    </span>
+
+                    {% if v.descripcion %}
+                        <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 10px; line-height: 1.3;">
+                            {{ v.descripcion }}
+                        </p>
+                    {% endif %}
+                    {% for v in ventas %}
+                    <div class="card-venta">
+                        <div style="margin-top: 15px;">
+                            <a href="https://wa.me/593978792896?text=Hola%20Karen,%20me%20interesa%20comprar%20el%20producto:%20{{ v.nombre|urlencode }}" 
+                            class="btn-whatsapp" 
+                            target="_blank">
+                            🛒 Comprar por WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+                <p class="text-center text-muted">No hay artículos en venta actualmente.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>{% else %}
+    <div class="glass-panel" style="text-align:center;">
+        <h2>No hay datos disponibles</h2>
+    </div>
+{% endif %}
+<div id="modalPDF" class="modal">
+    <div class="modal-box">
+        <form action="{% url 'curriculum:exportar_pdf_completo' %}" method="get" target="_blank">
+            <h2 class="modal-header">Seleccionar Secciones para PDF</h2>
+            <div class="modal-options">
+                <label><input type="checkbox" name="exp" checked> Incluir Experiencia</label>
+                <label><input type="checkbox" name="cursos" checked> Incluir Cursos Realizados</label>
+                <label><input type="checkbox" name="logros" checked> Incluir Reconocimientos</label>
+                <label><input type="checkbox" name="prod_acad" checked> Incluir Productos Académicos</label>
+                <label><input type="checkbox" name="proyectos" checked> Incluir Productos Laborales</label>
+                <label><input type="checkbox" name="venta"> Incluir Venta Garage</label>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" onclick="cerrarModal()" class="btn-red">Cancelar</button>
+                <button type="submit" class="btn-blue">Generar PDF</button>
+            </div>
+        </form>
+    </div>
+</div>
+</main>
+<script>
+function abrirModal() {
+    document.getElementById('modalPDF').style.display = 'flex';
+}
+
+function cerrarModal() {
+    document.getElementById('modalPDF').style.display = 'none';
+}
+
+// Esto cierra el modal si haces clic fuera de él
+window.onclick = function(event) {
+    if (event.target == document.getElementById('modalPDF')) {
+        cerrarModal();
+    }
+}
+</script>
+{% endblock %}

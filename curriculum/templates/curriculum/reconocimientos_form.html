@@ -1,0 +1,75 @@
+{% extends 'curriculum/base_admin.html' %}
+{% block title %}{% if form.instance.pk %}Editar{% else %}Agregar{% endif %} Reconocimiento{% endblock %}
+
+{% block content %}
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2>
+            {% if form.instance.pk %}
+                <i class="fas fa-edit me-2"></i> Editar Reconocimiento
+            {% else %}
+                <i class="fas fa-plus-circle me-2"></i> Agregar Reconocimiento
+            {% endif %}
+        </h2>
+        <a href="{% url 'curriculum:dashboard' %}" class="btn-volver">Volver</a>
+    </div>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label">Tipo de Reconocimiento:</label>
+                <input type="text" name="tiporeconocimiento" value="{{ form.tiporeconocimiento.value|default:'' }}" placeholder="Ej: Empleado del Mes">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Fecha:</label>
+                <input type="date" name="fechareconocimiento" value="{{ form.fechareconocimiento.value|date:'Y-m-d' }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Entidad que Otorga:</label>
+                <input type="text" name="entidadpatrocinadora" value="{{ form.entidadpatrocinadora.value|default:'' }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Nombre del Contacto:</label>
+                <input type="text" name="nombrecontactoauspicia" value="{{ form.nombrecontactoauspicia.value|default:'' }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Teléfono del Contacto:</label>
+                <input type="text" name="telefonocontactoauspicia" value="{{ form.telefonocontactoauspicia.value|default:'' }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Certificado (PDF/Imagen):</label>
+                <input type="file" name="rutacertificado">
+            </div>
+
+            <div class="form-group" style="grid-column: span 2;">
+                <label class="form-label">Descripción del Reconocimiento:</label>
+                <textarea name="descripcionreconocimiento" rows="4">{{ form.descripcionreconocimiento.value|default:'' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Mostrar en el front: 
+                    <input type="checkbox" name="activarparaqueseveaenfront" {% if form.activarparaqueseveaenfront.value %}checked{% endif %}>
+                </label>
+            </div>
+            
+            <div class="form-actions" style="grid-column: span 2; display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; border-radius: 10px; font-weight: bold; background-color: #66f7a7; color: white; border: none; font-size: 16px; cursor: pointer;">
+                    Guardar
+                </button>
+                
+                <a href="{% url 'curriculum:dashboard' %}" style="width: 100%; padding: 14px; border-radius: 10px; font-weight: bold; background-color: #94948c; color: white; text-decoration: none; text-align: center; font-size: 16px; box-sizing: border-box;">
+                    Cancelar
+                </a>
+
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+
+<style>
+    body {
+        font-family: 'Courier New', monospace;
+        background-color: #f2f4f8;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .contenedor-principal {
+        width: 100%;
+    }
+
+    .seccion-card {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+        page-break-inside: avoid;
+    }
+
+    .encabezado {
+        text-align: center;
+    }
+
+    .foto-perfil {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #2c3e50;
+        margin-bottom: 15px;
+    }
+
+    h1 {
+        color: #2c3e50;
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    h2 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3182ce;
+        padding-bottom: 8px;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        font-size: 18px;
+    }
+
+    .info-row {
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
+    /* Venta Garage */
+    .card-venta {
+        text-align: center;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .img-producto {
+        max-width: 280px;
+        border-radius: 8px;
+        margin: 15px auto;
+        display: block;
+    }
+
+    .precio-producto {
+        font-size: 28px;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+
+    .btn-whatsapp {
+        display: inline-block;
+        background-color: #25D366;
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 40px;
+        font-weight: bold;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+
+    .estado-bueno{
+        color: green;
+        font-weight: bold;
+    }
+
+    .estado-regular{
+        color: goldenrod;
+        font-weight: bold;
+    }
+</style>
+</head>
+
+<body>
+<div class="contenedor-principal">
+
+<!-- ================= ENCABEZADO ================= -->
+<div class="seccion-card encabezado">
+    {% if foto_base64 %}
+        <img src="data:image/jpeg;base64,{{ foto_base64 }}" class="foto-perfil">
+    {% endif %}
+
+    <h1>{{ datos.nombres }} {{ datos.apellidos }}</h1>
+        <div class="info-row"><span class="label">Cédula:</span> {{ datos.numerocedula }}</div>
+        <div class="info-row"><span class="label">Nacionalidad:</span> {{ datos.nacionalidad }}</div>
+        <div class="info-row"><span class="label">Lugar de Nacimiento:</span> {{ datos.lugarnacimiento }}</div>
+        <div class="info-row"><span class="label">Fecha de Nacimiento:</span> {{ datos.fechanacimiento|date:"d/m/Y" }}</div>
+        <div class="info-row"><span class="label">Sexo:</span> {% if datos.sexo == 'M' %}Mujer{% else %}Hombre{% endif %}</div>
+        <div class="info-row"><span class="label">Estado Civil:</span> {{ datos.estadocivil }}</div>
+        <div class="info-row"><span class="label">Teléfono:</span> {{ datos.telefonofijo|default:datos.telefonoconvencional }}</div>
+        <div class="info-row"><span class="label">Dirección:</span> {{ datos.direcciondomiciliaria }}</div>
+</div>
+
+<!-- ================= EXPERIENCIA LABORAL ================= -->
+{% if experiencias is not None %}
+<div class="seccion-card">
+    <h2>Experiencia Laboral</h2>
+
+    {% if experiencias %}
+        {% for e in experiencias %}
+            <strong>{{ e.cargo }}</strong><br>
+            Empresa: {{ e.empresa }}
+        {% endfor %}
+    {% else %}
+        <p>No registra experiencia laboral.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- ================= CURSOS ================= -->
+{% if cursos is not None %}
+<div class="seccion-card">
+    <h2>Cursos Realizados</h2>
+
+    {% if cursos %}
+        {% for c in cursos %}
+            <strong>{{ c.nombre }}</strong><br>
+            Institución: {{ c.entidad }}
+        {% endfor %}
+    {% else %}
+        <p>No registra cursos.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- ================= RECONOCIMIENTOS ================= -->
+{% if reconocimientos is not None %}
+<div class="seccion-card">
+    <h2>Reconocimientos</h2>
+
+    {% if reconocimientos %}
+        {% for r in reconocimientos %}
+            <strong>{{ r.nombre }}</strong><br>
+            Otorgado por: {{ r.entidad }}
+        {% endfor %}
+    {% else %}
+        <p>No registra reconocimientos.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- ================= PRODUCTOS ACADÉMICOS ================= -->
+{% if productos_academicos is not None %}
+<div class="seccion-card">
+    <h2>Productos Académicos</h2>
+
+    {% if productos_academicos %}
+        {% for pa in productos_academicos %}
+            <strong>{{ pa.nombre }}</strong>
+        {% endfor %}
+    {% else %}
+        <p>No registra productos académicos.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- ================= PRODUCTOS LABORALES ================= -->
+{% if productos_laborales is not None %}
+<div class="seccion-card">
+    <h2>Productos Laborales</h2>
+
+    {% if productos_laborales %}
+        {% for pl in productos_laborales %}
+                <strong>{{ pl.nombre }}</strong>
+        {% endfor %}
+    {% else %}
+        <p>No registra productos laborales.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- ================= VENTA GARAGE ================= -->
+{% if ventas is not None %}
+<div class="seccion-card">
+    <h2>Venta Garage</h2>
+
+    {% if ventas %}
+        {% for v in ventas %}
+            <div class="card-venta">
+                <strong>{{ v.nombre }}</strong>
+
+                {% if v.foto_64 %}
+                    <img src="data:image/jpeg;base64,{{ v.foto_64 }}" class="img-producto">
+                {% endif %}
+
+                <div class="precio-producto">${{ v.precio }}</div>
+                <p>Estado:
+                    {% if v.estado == 'Bueno' %}
+                        <span class="estado-bueno">{{ v.estado }}</span>
+                    {% else %}
+                        <span class="estado-regular">{{ v.estado }}</span>
+                    {% endif %}
+                </p>
+                <a class="btn-whatsapp"
+                   href="https://wa.me/593978792896?text=Hola,%20me%20interesa%20{{ v.nombre|urlencode }}">
+                   Comprar por WhatsApp
+                </a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No registra productos en venta.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+</div>
+</body>
+</html>

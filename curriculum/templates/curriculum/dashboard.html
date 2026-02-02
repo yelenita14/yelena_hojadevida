@@ -1,0 +1,319 @@
+{% extends 'curriculum/base_admin.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Panel de Control</h2>
+
+        </div>
+            <a href="{% url 'curriculum:home' %}" class="btn btn-primary shadow-sm px-4" target="_blank">
+                <i class="fas fa-eye me-2"></i> Ver CV Público
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-0" style="border-left: 5px solid #4361ee !important;">
+            <div class="card-body d-flex justify-content-between align-items-center py-4 px-4">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-light p-3 me-3 text-primary">
+                        {% if perfil.foto_perfil %}
+                            <img src="{{ perfil.foto_perfil.url }}" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                        {% else %}
+                            <i class="fas fa-user-circle fa-2x"></i>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {% if perfil %}
+                            <h4 class="mb-0 fw-bold text-dark">{{ perfil.nombres }} {{ perfil.apellidos }}</h4>
+                            <p class="text-muted mb-0 small">
+                                <i class="fas fa-id-card me-1"></i> {{ perfil.numerocedula }} | 
+                                <i class="fas fa-phone me-1"></i> {{ perfil.telefonofijo }} 
+                            </p>
+                        {% else %}
+                            <h4 class="mb-0 fw-bold text-dark">Sin Datos Registrados</h4>
+                            <p class="text-muted mb-0 small">Por favor, completa tu información de perfil.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    {% if perfil %}
+                        <a href="{% url 'curriculum:editar_datos_personales' %}" class="btn btn-outline-primary rounded-pill px-4 shadow-sm">
+                            <i class="fas fa-user-edit me-2"></i> Editar Perfil
+                        </a>
+                        <a href="{% url 'curriculum:eliminar_datos_personales' %}" 
+                           class="btn btn-outline-danger rounded-pill px-4 shadow-sm" 
+                           onclick="return confirm('¿Estás seguro de eliminar todos tus datos personales?')">
+                            <i class="fas fa-trash-alt me-2"></i> Eliminar
+                        </a>
+                    {% else %}
+                        <a href="{% url 'curriculum:agregar_datos_personales' %}" class="btn btn-success rounded-pill px-4 shadow-sm">
+                            <i class="fas fa-plus me-2"></i> Crear Perfil
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold" style="color: #4361ee;">
+                        <i class="fas fa-briefcase me-2"></i>Experiencia Laboral
+                    </h5>
+                    <a href="{% url 'curriculum:agregar_experiencia' %}" class="btn btn-sm btn-success rounded-pill px-3">
+                        <i class="fas fa-plus me-1"></i> Añadir
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <tbody class="border-top-0">
+                                {% for exp in experiencias %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="fw-bold d-block text-dark">{{ exp.cargodesempenado }}</span>
+                                        <small class="text-muted">{{ exp.nombrempresa }}</small>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group shadow-sm">
+                                            <a href="{% url 'curriculum:editar_experiencia' exp.pk %}" class="btn btn-sm btn-light text-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'curriculum:eliminar_experiencia' exp.pk %}" class="btn btn-sm btn-light text-danger" title="Eliminar" onclick="return confirm('¿Estás seguro?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center py-4 text-muted small">No hay datos</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold" style="color: #0dcaf0;">
+                        <i class="fas fa-graduation-cap me-2"></i>Cursos Realizados
+                    </h5>
+                    <a href="{% url 'curriculum:agregar_curso' %}" class="btn btn-sm btn-success rounded-pill px-3">
+                        <i class="fas fa-plus me-1"></i> Añadir
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <tbody>
+                                {% for curso in cursos %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="fw-bold d-block text-dark">{{ curso.nombrecurso }}</span>
+                                        <small class="text-muted">{{ curso.entidadpatrocinadora }}</small>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group shadow-sm">
+                                            <a href="{% url 'curriculum:editar_curso' curso.pk %}" class="btn btn-sm btn-light text-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'curriculum:eliminar_curso' curso.pk %}" class="btn btn-sm btn-light text-danger" onclick="return confirm('¿Eliminar?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center py-4 text-muted small">No hay datos</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold" style="color: #6f42c1;">
+                        <i class="fas fa-award me-2"></i>Reconocimientos
+                    </h5>
+                    <a href="{% url 'curriculum:agregar_reconocimiento' %}" class="btn btn-sm btn-success rounded-pill px-3">
+                        <i class="fas fa-plus me-1"></i> Añadir
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <tbody>
+                                {% for rec in reconocimientos %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="fw-bold d-block text-dark">{{ rec.tiporeconocimiento }}</span>
+                                        <small class="text-muted">{{ rec.entidadpatrocinadora }}</small>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group shadow-sm">
+                                            <a href="{% url 'curriculum:editar_reconocimiento' rec.pk %}" class="btn btn-sm btn-light text-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'curriculum:eliminar_reconocimiento' rec.pk %}" class="btn btn-sm btn-light text-danger" onclick="return confirm('¿Eliminar?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center py-4 text-muted small">No hay datos</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold" style="color: #fd7e14;">
+                        <i class="fas fa-book me-2"></i>Productos Académicos
+                    </h5>
+                    <a href="{% url 'curriculum:agregar_producto_academico' %}" class="btn btn-sm btn-success rounded-pill px-3">
+                        <i class="fas fa-plus me-1"></i> Añadir
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <tbody>
+                                {% for prod in productos_academicos %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="fw-bold d-block text-dark">{{ prod.nombrerecurso }}</span>
+                                        <small class="text-muted">{{ prod.clasificador }}</small>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group shadow-sm">
+                                            <a href="{% url 'curriculum:editar_producto_academico' prod.pk %}" class="btn btn-sm btn-light text-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'curriculum:eliminar_producto_academico' prod.pk %}" class="btn btn-sm btn-light text-danger" onclick="return confirm('¿Eliminar?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center py-4 text-muted small">No hay datos</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold" style="color: #20c997;">
+                        <i class="fas fa-code me-2"></i>Productos Laborales
+                    </h5>
+                    <a href="{% url 'curriculum:agregar_producto_laboral' %}" class="btn btn-sm btn-success rounded-pill px-3">
+                        <i class="fas fa-plus me-1"></i> Añadir
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <tbody>
+                                {% for prod in productos_laborales %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="fw-bold d-block text-dark">{{ prod.nombreproducto }}</span>
+                                        <small class="text-muted">{{ prod.fechaproducto }}</small>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group shadow-sm">
+                                            <a href="{% url 'curriculum:editar_producto_laboral' prod.pk %}" class="btn btn-sm btn-light text-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'curriculum:eliminar_producto_laboral' prod.pk %}" class="btn btn-sm btn-light text-danger" onclick="return confirm('¿Eliminar?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center py-4 text-muted small">No hay datos</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold" style="color: #dc3545;">
+                        <i class="fas fa-shopping-bag me-2"></i>Venta Garage
+                    </h5>
+                    <a href="{% url 'curriculum:agregar_venta' %}" class="btn btn-sm btn-success rounded-pill px-3">
+                        <i class="fas fa-plus me-1"></i> Añadir
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <tbody>
+                                {% for venta in ventas %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="fw-bold d-block text-dark">{{ venta.nombreproducto }}</span>
+                                        <small class="text-primary fw-bold">${{ venta.valordelbien }}</small>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group shadow-sm">
+                                            <a href="{% url 'curriculum:editar_venta' venta.pk %}" class="btn btn-sm btn-light text-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'curriculum:eliminar_venta' venta.pk %}" class="btn btn-sm btn-light text-danger" onclick="return confirm('¿Eliminar?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center py-4 text-muted small">No hay datos</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .card { transition: 0.3s; border-radius: 15px; overflow: hidden; }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+    .btn-group .btn { border: 1px solid #eee; background: white; }
+    .btn-group .btn:hover { background: #f8f9fa; }
+    .table td { border-bottom: 1px solid #f1f1f1; padding: 12px 0; }
+</style>
+{% endblock %}
