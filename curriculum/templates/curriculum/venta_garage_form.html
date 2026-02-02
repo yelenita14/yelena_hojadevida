@@ -25,9 +25,9 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Precio:</label>
-                <input type="number" step="0.01" name="valordelbien" value="{{ form.valordelbien.value|default:'' }}">
-            </div>
+    <label class="form-label">Precio:</label>
+    <input type="number" step="0.01" min="0" name="valordelbien" value="{{ form.valordelbien.value|default:'' }}">
+</div>
 
             <div class="form-group" style="grid-column: span 2;">
                 <label class="form-label">Descripción:</label>
