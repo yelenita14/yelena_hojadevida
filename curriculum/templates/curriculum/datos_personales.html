@@ -82,7 +82,12 @@
         </div>
 
         <div class="button-group">
-            <button type="submit" class="btn-action btn-guardar">Guardar </button>
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; border-radius: 10px; font-weight: bold; background-color: #66f7a7; color: white; border: none; font-size: 16px; cursor: pointer;">
+                    Guardar
+            </button>
+            <a href="{% url 'curriculum:dashboard' %}" style="width: 100%; padding: 14px; border-radius: 10px; font-weight: bold; background-color: #94948c; color: white; text-decoration: none; text-align: center; font-size: 16px; box-sizing: border-box;">
+                    Cancelar
+            </a>
         </div>
     </form>
 </div>
